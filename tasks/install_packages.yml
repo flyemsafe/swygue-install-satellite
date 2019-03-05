@@ -1,6 +1,10 @@
 ---
 # vim: sw=4 ts=102 ai
 # tasks file for satellite
+#- name: register system to subscription manager
+#  include_role:
+#    name: swygue-redhat-subscription
+
 - name: ensure packages are updated
   yum:
     name: '*'

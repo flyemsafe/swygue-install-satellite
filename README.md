@@ -10,9 +10,23 @@ Requirements
 Role Variables
 --------------
 
+satellite_default_location
+satellite_default_organization
+satellite_enable_discovery
+satellite_enable_tftp
+hostname
+satellite_user
+satellite_pass
+satellite_packages
+rhsm_repos
+satellite_default_location
+satellite_default_organization
+satellite_enable_tftp
+satellite_enable_discovery
 
 Dependencies
 ------------
+- swygue-redhat-subscription
 
 Example Playbook
 ----------------

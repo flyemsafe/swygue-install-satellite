@@ -28,24 +28,3 @@
 
 - include: satellite_install.yml
   tags: [satellite-install, satellite]
-
-- include: satellite_manifest.yml
-  tags: [satellite-manifest, satellite-hammer, satellite]
-
-- include: satellite_repos.yml
-  tags: [satellite-repos, satellite-hammer, satellite]
-
-- include: satellite_sync.yml
-  tags: [satellite-sync, satellite-hammer, satellite]
-
-- include: satellite_view.yml
-  tags: [satellite-view, satellite-hammer, satellite]
-
-- include: satellite_environments.yml
-  tags: [satellite-environments, satellite-hammer, satellite]
-
-- include: satellite_cv_filter.yml
-  tags: [satellite-cv-filter, satellite-hammer, satellite]
-
-- include: satellite_provision.yml
-  tags: [satellite-provision, satellite-hammer, satellite]
