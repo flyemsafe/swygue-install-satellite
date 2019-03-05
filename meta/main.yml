@@ -2,4 +2,3 @@
 # vim: sw=2 ts=102 ai
 dependencies:
  # - { role: swygue-redhat-subscription }
- # - { role: satellite-shared }
