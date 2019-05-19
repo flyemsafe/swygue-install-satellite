@@ -33,6 +33,8 @@ none
 
 Example Playbook
 ----------------
+
+```
 - name: install Red Hat Satellite
   hosts: sat
   become: true
@@ -49,7 +51,7 @@ Example Playbook
   - name: satellite
     include_role:
       name: swygue-install-satellite
-
+```
 
 License
 -------
