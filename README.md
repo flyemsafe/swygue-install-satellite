@@ -1,11 +1,13 @@
-Role Name
+swygue-install-satellite
 =========
+
+This role installs the latest Satellite 6 server using `satellite-installer --scenario satellite`.
 
 
 Requirements
 ------------
 
-
+OS installed and subscribe to RHSM.
 
 Role Variables
 --------------
@@ -27,14 +29,27 @@ Role Variables
 
 Dependencies
 ------------
-- swygue-redhat-subscription
+none
 
 Example Playbook
 ----------------
+- name: install Red Hat Satellite
+  hosts: sat
+  become: true
+  vars:
+    - satellite_default_location: LA
+    - satellite_default_organization: ACME
+    - satellite_domain: acme.example
+    - satellite_hostname: sat
+    - satellite_ip_address: 192.168.11.3
+    - satellite_user: admin
+    - satellite_pass: password
 
-    - hosts: servers
-      roles:
-         - { role: swygue-satellite }
+  tasks:
+  - name: satellite
+    include_role:
+      name: swygue-install-satellite
+
 
 License
 -------
