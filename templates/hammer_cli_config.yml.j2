@@ -3,7 +3,7 @@
     - hammer_cli_foreman
 
 :foreman:
-    :host: 'https://{{ hostname }}'
+    :host: 'https://{{ satellite_hostname }}.{{ satellite_domain }}'
     :username: '{{ satellite_user }}'
     :password: '{{ satellite_pass }}'
 

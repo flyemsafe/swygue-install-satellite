@@ -8,7 +8,7 @@
 # we do this early as some stuff doesn't need to be done if it's already working
 - name: check if satellite is answering
   uri:
-    url: "https://{{ hostname }}/api/organizations"
+    url: "https://{{ satellite_hostname }}.{{ satellite_domain }}/api/organizations"
     user: "{{ satellite_user }}"
     password: "{{ satellite_pass }}"
     force_basic_auth: yes

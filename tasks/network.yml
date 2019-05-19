@@ -1,7 +1,15 @@
 ---
-# vim: sw=2 ts=102 ai
+- name: set hostname with hostnamectl
+  hostname:
+    name: "{{ satellite_hostname }}.{{ satellite_domain }}"
 
-# need firewalld for firewalld module
+- name: update /etc/hosts with satellite hostname
+  lineinfile:
+    line: "{{ satellite_ip_address }}
+      {{ satellite_hostname }}.{{ satellite_domain }}
+      {{ satellite_hostname }}"
+    dest: "/etc/hosts"
+
 - name: install firewalld
   yum:
     name: firewalld
@@ -15,14 +23,8 @@
 
 - name: firewalld services
   firewalld:
-    service: "{{ item }}"
-    immediate: true
     permanent: true
+    immediate: true
+    port: "{{ item }}"
     state: enabled
-  with_items:
-    - dhcp
-    - tftp
-    - dns
-    - https
-    - http
-    - RH-Satellite-6
+  with_items: "{{ satellite_firewall_ports }}"
