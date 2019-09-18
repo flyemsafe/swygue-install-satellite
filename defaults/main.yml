@@ -11,6 +11,7 @@ satellite_user: ""
 satellite_pass: ""
 satellite_enable_discovery: true
 satellite_enable_tftp: true
+satellite_version: 6.5
 
 satellite_extra_packages:
   - "wget"
@@ -35,6 +36,20 @@ satellite_firewall_ports:
   - 67/udp
   - 68/udp
   - 69/udp
+
+satellite_repos:
+  - rhel-7-server-rpms
+  - rhel-server-rhscl-7-rpms
+  - "rhel-7-server-satellite-{{ satellite_version }}-rpms"
+  - rhel-7-server-satellite-maintenance-6-rpms
+  - rhel-7-server-ansible-2.6-rpms
+
+# RHSM Subscription - set register_with_rhsm to yes and the other variables are all required
+register_with_rhsm: no
+rhsm_user: ""
+rhsm_password: ""
+satellite_pool_id: ""
+
 
 satellite_packages: |
   [ "satellite", "bind-utils", "pulp-admin-client", "pulp-rpm-admin-extensions", "vim",
