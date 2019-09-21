@@ -16,10 +16,18 @@
   when: register_with_rhsm|bool
   ignore_errors: yes
   
-- name: ensure packages are updated
-  yum:
-    name: '*'
-    state: latest
+- name: check for yum updates
+  shell: yum check-update --quiet | grep -v "^$\|installed\|running" | wc -l
+  args:
+    warn: false
+  register: yum_updates
+  changed_when: yum_updates.stdout != "0"
+
+- name: upgrade all packages
+  command: yum -y update
+  args:
+    warn: false
+  when: yum_updates.stdout != "0"
 
 - name: remove ntp
   yum:
