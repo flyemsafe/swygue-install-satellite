@@ -1,7 +1,7 @@
 ---
 # vim: sw=2 ts=102 ai
 
-- name: install satellite
+- name: install satellite pre 6.6
   shell: |
     satellite-installer --scenario satellite -v --force \
     --foreman-initial-location {{ satellite_default_location }} \
@@ -13,7 +13,21 @@
     --foreman-proxy-templates=1 \
     --foreman-admin-username {{ satellite_user }} \
     --foreman-admin-password {{ satellite_pass }}
-  when: not satellite_is_installed
+  when: not satellite_is_installed and satellite_version|float < 6.6
+
+- name: install satellite 6.6
+  shell: |
+    satellite-installer --scenario satellite -v --force \
+    --foreman-initial-location {{ satellite_default_location }} \
+    --foreman-initial-organization {{ satellite_default_organization }} \
+    {% if satellite_enable_tftp %}--foreman-proxy-tftp=true {% endif %} \
+    {% if satellite_enable_discovery %}--enable-foreman-plugin-discovery \
+    --foreman-proxy-plugin-discovery-install-images=true \
+     {% endif %} \
+    --foreman-proxy-templates=1 \
+    --foreman-initial-admin-username {{ satellite_user }} \
+    --foreman-initial-admin-password {{ satellite_pass }}
+  when: not satellite_is_installed and satellite_version|float > 6.5
 
 - set_fact:
     satellite_is_installed: true
