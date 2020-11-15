@@ -10,21 +10,24 @@
       {{ satellite_hostname }}"
     dest: "/etc/hosts"
 
-- name: install firewalld
-  yum:
-    name: firewalld
-    state: present
+- name: setup firewalld
+  when: setup_firewall
+  block:
+    - name: install firewalld
+      yum:
+        name: firewalld
+        state: present
 
-- name: start firewalld
-  systemd:
-    name: firewalld
-    state: started
-    enabled: yes
+    - name: start firewalld
+      systemd:
+        name: firewalld
+        state: started
+        enabled: yes
 
-- name: firewalld services
-  firewalld:
-    permanent: true
-    immediate: true
-    port: "{{ item }}"
-    state: enabled
-  with_items: "{{ satellite_firewall_ports }}"
+    - name: firewalld services
+      firewalld:
+        permanent: true
+        immediate: true
+        port: "{{ item }}"
+        state: enabled
+      loop: "{{ satellite_firewall_ports }}"

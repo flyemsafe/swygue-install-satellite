@@ -1,30 +1,18 @@
 ---
-# vim: sw=2 ts=102 ai
 # tasks file for satellite
 
-# make sure the previous role's handlers were called
-- meta: flush_handlers
+- name: check if satellite is already up and listening
+  import_tasks: check-satellite-state.yml
 
-# we do this early as some stuff doesn't need to be done if it's already working
-- name: check if satellite is answering
-  uri:
-    url: "https://{{ satellite_hostname }}.{{ satellite_domain }}/api/organizations"
-    user: "{{ satellite_user }}"
-    password: "{{ satellite_pass }}"
-    force_basic_auth: yes
-  register: satellite_is_installed
-  ignore_errors: yes
-  tags: [ always ]
-- set_fact:
-    satellite_is_installed: "{{ False if satellite_is_installed.failed | default(False) or satellite_is_installed.status != 200 else True }}"
-  tags: [ always ]
-
-- include: install_packages.yml
+- name: ensure required repos are present
+  import_tasks: repos.yml
   tags: [satellite-packages, satellite]
   when: not satellite_is_installed
 
-- include: network.yml
+- name: ensure firewall ports are enabled
+  import_tasks: network.yml
   tags: [satellite-networks, satellite]
 
-- include: satellite_install.yml
+- name: install the satellite server
+  import_tasks: satellite_install.yml
   tags: [satellite-install, satellite]

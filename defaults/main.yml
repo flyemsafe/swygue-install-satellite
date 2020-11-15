@@ -8,18 +8,11 @@ satellite_domain: ""
 satellite_hostname: ""
 satellite_ip_address: ""
 satellite_user: ""
-satellite_pass: ""
-satellite_enable_discovery: true
-satellite_enable_tftp: true
-satellite_version: 6.5
-
-satellite_extra_packages:
-  - "wget"
-  - "git"
-  - "net-tools"
-  - "bash-completion"
-  - "screen"
-  - "vim-*"
+satellite_password: ""
+satellite_enable_discovery: false
+satellite_enable_tftp: false
+satellite_version: 6.8
+ansible_version: 2.9
 
 satellite_firewall_ports:
   - 22/tcp
@@ -42,16 +35,9 @@ satellite_repos:
   - rhel-server-rhscl-7-rpms
   - "rhel-7-server-satellite-{{ satellite_version }}-rpms"
   - rhel-7-server-satellite-maintenance-6-rpms
-  - rhel-7-server-ansible-2.6-rpms
+  - "rhel-7-server-ansible-{{ ansible_version }}-rpms"
 
-# RHSM Subscription - set register_with_rhsm to yes and the other variables are all required
-register_with_rhsm: no
-rhsm_user: ""
-rhsm_password: ""
-satellite_pool_id: ""
+setup_chrony: yes
+setup_firewall: yes
 
-
-satellite_packages: |
-  [ "satellite", "bind-utils", "pulp-admin-client", "pulp-rpm-admin-extensions", "vim",
-  {% if satellite_enable_discovery == True %}"foreman-discovery-image"{% endif %}
-  ]
+satellite_packages: satellite, sos, chrony

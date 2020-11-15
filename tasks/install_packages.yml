@@ -1,21 +1,4 @@
 ---
-- name: attach to the subscription pools provided
-  redhat_subscription:
-    state: present
-    username: "{{ rhsm_user }}"
-    password: "{{ rhsm_password }}"
-    pool_ids: "{{ satellite_pool_id }}"
-  when: register_with_rhsm|bool
-
-- name: Enable repositories
-  redhat_repositories:
-    id: "{{ item }}"
-    state: enabled
-    mode: incremental
-  with_items: "{{ satellite_repos }}"
-  when: register_with_rhsm|bool
-  ignore_errors: yes
-  
 - name: check for yum updates
   shell: yum check-update --quiet | grep -v "^$\|installed\|running" | wc -l
   args:
@@ -29,23 +12,26 @@
     warn: false
   when: yum_updates.stdout != "0"
 
-- name: remove ntp
-  yum:
-    name: "ntp,ntpdate"
-    state: absent
+- name: replace ntp with chrony
+  when: setup_chrony
+  block:
+    - name: remove ntp
+      yum:
+        name: "ntp,ntpdate"
+        state: absent
 
-- name: install chrony
-  yum:
-    name: "chrony"
-    state: present
+    - name: install chrony
+      yum:
+        name: "chrony"
+        state: present
 
-- name: start chrony
-  systemd:
-    name: chronyd
-    state: started
-    enabled: yes
+    - name: start chrony
+      systemd:
+        name: chronyd
+        state: started
+        enabled: yes
 
 - name: Install Satellite packages
   yum:
-    name: "{{ satellite_packages + satellite_extra_packages }}"
+    name: "{{ satellite_packages }}"
     state: present

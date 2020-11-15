@@ -1,7 +1,48 @@
 ---
-# vim: sw=2 ts=102 ai
+- name: check for yum updates
+  shell: yum check-update --quiet | grep -v "^$\|installed\|running" | wc -l
+  args:
+    warn: false
+  register: yum_updates
+  changed_when: yum_updates.stdout != "0"
 
-- name: install satellite pre 6.6
+- name: upgrade all packages
+  command: yum -y update
+  args:
+    warn: false
+  when: yum_updates.stdout != "0"
+
+- name: replace ntp with chrony
+  when: setup_chrony
+  block:
+    - name: remove ntp
+      yum:
+        name: "ntp,ntpdate"
+        state: absent
+
+    - name: install chrony
+      yum:
+        name: "chrony"
+        state: present
+
+    - name: start chrony
+      systemd:
+        name: chronyd
+        state: started
+        enabled: yes
+
+- name: Install Satellite packages
+  yum:
+    name: "{{ satellite_packages }}"
+    state: present
+
+#- name: append tuning profile
+#  set_fact:
+#    satellite_installer_options: "{{ satellite_installer_options }} --tuning '{{ satellite.tuning_profile }}'"
+#  when:
+#    - satellite.tuning_profile is defined
+
+- name: run satellite-installer --scenario satellite
   shell: |
     satellite-installer --scenario satellite -v --force \
     --foreman-initial-location {{ satellite_default_location }} \
@@ -12,25 +53,15 @@
      {% endif %} \
     --foreman-proxy-templates=1 \
     --foreman-admin-username {{ satellite_user }} \
-    --foreman-admin-password {{ satellite_pass }}
-  when: not satellite_is_installed and satellite_version|float < 6.6
+    --foreman-admin-password {{ satellite_password }}
+  when: not satellite_is_installed
 
-- name: install satellite 6.6
-  shell: |
-    satellite-installer --scenario satellite -v --force \
-    --foreman-initial-location {{ satellite_default_location }} \
-    --foreman-initial-organization {{ satellite_default_organization }} \
-    {% if satellite_enable_tftp %}--foreman-proxy-tftp=true {% endif %} \
-    {% if satellite_enable_discovery %}--enable-foreman-plugin-discovery \
-    --foreman-proxy-plugin-discovery-install-images=true \
-     {% endif %} \
-    --foreman-proxy-templates=1 \
-    --foreman-initial-admin-username {{ satellite_user }} \
-    --foreman-initial-admin-password {{ satellite_pass }}
-  when: not satellite_is_installed and satellite_version|float > 6.5
+- name: check if satellite is up and answering
+  include_tasks: check-satellite-state.yml
 
-- set_fact:
-    satellite_is_installed: true
+- name: fail if satellite isn't running
+  fail:
+    msg: "Was not able to ensure only the required repos for satellite installation are enabled"
   when: not satellite_is_installed
 
 - name: create hammer auth directory

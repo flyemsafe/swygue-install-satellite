@@ -22,9 +22,8 @@ Role Variables
 |satellite_hostname|:heavy_check_mark: |null|Satellite server host short name|
 |satellite_ip_address|:heavy_check_mark: |null|Satellite server IP addresses|
 |satellite_user|:heavy_check_mark: |admin|null|Satellite admin user|
-|satellite_pass|:heavy_check_mark: |null|Satellite admin password|
+|satellite_password|:heavy_check_mark: |null|Satellite admin password|
 |satellite_firewall_ports|:x:|```defaults/main.yml```|Satellite server required ports|
-|satellite_packages|:x:|```defaults/main.yml```|Satellite required pacakges|
 |satellite_extra_packages|:x:|```defaults/main.yml```|Useful packages|
 
 Dependencies
@@ -45,7 +44,7 @@ Example Playbook
     - satellite_hostname: sat
     - satellite_ip_address: 192.168.11.3
     - satellite_user: admin
-    - satellite_pass: password
+    - satellite_password: password
 
   tasks:
   - name: satellite
