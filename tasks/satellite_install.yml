@@ -36,12 +36,6 @@
     name: "{{ satellite_packages }}"
     state: present
 
-#- name: append tuning profile
-#  set_fact:
-#    satellite_installer_options: "{{ satellite_installer_options }} --tuning '{{ satellite.tuning_profile }}'"
-#  when:
-#    - satellite.tuning_profile is defined
-
 - name: run satellite-installer --scenario satellite
   shell: |
     satellite-installer --scenario satellite -v --force \
@@ -51,10 +45,10 @@
     {% if satellite_enable_discovery %}--enable-foreman-plugin-discovery \
     --foreman-proxy-plugin-discovery-install-images=true \
      {% endif %} \
-    --foreman-proxy-templates=1 \
-    --foreman-admin-username {{ satellite_user }} \
-    --foreman-admin-password {{ satellite_password }}
-  when: not satellite_is_installed
+    {% if satellite_enable_proxy_template %}--foreman-proxy-templates=1 {% endif %}\
+    --foreman-initial-admin-username {{ satellite_user }} \
+    --foreman-initial-admin-password {{ satellite_password }}
+  when: not satellite_is_installed or force_run_installer
 
 - name: check if satellite is up and answering
   include_tasks: check-satellite-state.yml

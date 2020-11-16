@@ -7,7 +7,6 @@
 - name: ensure required repos are present
   import_tasks: repos.yml
   tags: [satellite-packages, satellite]
-  when: not satellite_is_installed
 
 - name: ensure firewall ports are enabled
   import_tasks: network.yml

@@ -1,2 +1,7 @@
 ---
 # handlers file for satellite
+
+- name: firewalld_reload
+  systemd:
+    name: firewalld
+    state: reloaded

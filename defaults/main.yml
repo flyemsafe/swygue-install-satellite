@@ -2,6 +2,9 @@
 #vim ts=2 ts=2 ai extandtab
 # defaults file for satellite
 
+# set this to yes if you want to add new options to satellite
+force_run_installer: no
+
 satellite_default_location: ""
 satellite_default_organization: ""
 satellite_domain: ""
@@ -11,8 +14,12 @@ satellite_user: ""
 satellite_password: ""
 satellite_enable_discovery: false
 satellite_enable_tftp: false
-satellite_version: 6.8
-ansible_version: 2.9
+satellite_enable_proxy_template: no
+satellite_version: "6.8"
+ansible__repo_version: "2.9"
+
+setup_chrony: yes
+setup_firewall: yes
 
 satellite_firewall_ports:
   - 22/tcp
@@ -35,9 +42,7 @@ satellite_repos:
   - rhel-server-rhscl-7-rpms
   - "rhel-7-server-satellite-{{ satellite_version }}-rpms"
   - rhel-7-server-satellite-maintenance-6-rpms
-  - "rhel-7-server-ansible-{{ ansible_version }}-rpms"
-
-setup_chrony: yes
-setup_firewall: yes
+  - "rhel-7-server-ansible-{{ ansible_repo_version }}-rpms"
 
 satellite_packages: satellite, sos, chrony
+

@@ -1,0 +1,107 @@
+---
+- name: ensure all repos are enabled
+  failed_when: false
+  rhsm_repository:
+    name: "{{ repo }}"
+    state: enabled
+  loop_control:
+    loop_var: repo
+  loop:
+    - "{{ satellite_repos }}"
+  register: repos
+
+- name: set respos enabled if true
+  set_fact:
+    is_repos_enabled: yes
+  when: "'This system has no repositories' not in repos.msg"
+
+- name: fail when required yum repos not enabled
+  fail:
+    msg: "Unable to enable required repos. Please ensure the system is registered and entitled"
+  when: not is_repos_enabled
+
+- name: verify required repos are enabled
+  when: is_repos_enabled
+  block:
+    - name: create list of enabled repos
+      set_fact:
+        enabled_repos: "{{ repos.results | to_json | from_json | json_query(jqs) }}"
+
+#    - name: enabled_repos
+#      debug:
+#        var: enabled_repos
+#
+#    - name: repos
+#      debug:
+#        var: repos
+#
+#    - name: satellite_repos
+#      debug:
+#        var: satellite_repos
+#    - meta: end_play
+
+    - name: create list of repos to disable
+      set_fact:
+        repos_to_disable: "{{ repos_to_disable }} + [ '{{ item }}' ]"
+      loop: "{{ enabled_repos | list}}"
+      when: item not in satellite_repos
+
+    - name: disable unwanted repos
+      failed_when: false
+      rhsm_repository:
+        name: "{{ repo }}"
+        state: disabled
+      loop_control:
+        loop_var: repo
+      loop:
+        - "{{ repos_to_disable }}"
+      register: disable_repos
+
+    - name: get new list of enabled repos
+      set_fact:
+        new_enabled_repos: "{{ disable_repos.results | to_json | from_json | json_query(jqs) }}"
+
+    - name: create list repos enabled does not match required repos
+      set_fact:
+        current_repos: "{{ new_enabled_repos| difference(satellite_repos) | list }}"
+
+- name: show current repos
+  debug:
+    var: current_repos
+
+- name: fail if the enabled repos are different from what's required
+  fail:
+    msg: "Was not able to ensure only the required repos for satellite installation are enabled"
+  when: current_repos | length > 0
+
+- name: check for yum updates
+  shell: yum check-update --quiet | grep -v "^$\|installed\|running" | wc -l
+  args:
+    warn: false
+  register: yum_updates
+  changed_when: yum_updates.stdout != "0"
+
+- name: upgrade all packages
+  command: yum -y update
+  args:
+    warn: false
+  when: yum_updates.stdout != "0"
+
+- name: replace ntp with chrony
+  when: setup_chrony
+  block:
+    - name: remove ntp
+      yum:
+        name: "ntp,ntpdate"
+        state: absent
+
+    - name: install chrony
+      yum:
+        name: "chrony"
+        state: present
+
+    - name: start chrony
+      systemd:
+        name: chronyd
+        state: started
+        enabled: yes

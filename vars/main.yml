@@ -1,4 +1,5 @@
 ---
 # vars file for satellite
 enabled_repos: []
+repos_to_disable: []
 jqs: "[*].repositories | [0] | [?enabled != `false`].id"
