@@ -46,3 +46,6 @@ satellite_repos:
 
 satellite_packages: satellite, sos, chrony
 
+# set to yes deploy hammer cli config
+deploy_hammer_cli_config: no
+

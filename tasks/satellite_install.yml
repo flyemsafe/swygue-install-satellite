@@ -68,3 +68,4 @@
   template:
     src: hammer_cli_config.yml.j2
     dest: ~/.hammer/cli_config.yml
+  when: deploy_hammer_cli_config|bool
