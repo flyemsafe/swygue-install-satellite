@@ -9,9 +9,7 @@
   loop: "{{ satellite_repos }}"
   register: repos
 
-- meta: end_play
-
-- name: set respos enabled if true
+- name: set repos enabled if true
   set_fact:
     is_repos_enabled: yes
   when: "'This system has no repositories' not in repos.msg"
@@ -28,19 +26,6 @@
       set_fact:
         enabled_repos: "{{ repos.results | to_json | from_json | json_query(jqs) }}"
 
-#    - name: enabled_repos
-#      debug:
-#        var: enabled_repos
-#
-#    - name: repos
-#      debug:
-#        var: repos
-#
-#    - name: satellite_repos
-#      debug:
-#        var: satellite_repos
-#    - meta: end_play
-
     - name: create list of repos to disable
       set_fact:
         repos_to_disable: "{{ repos_to_disable }} + [ '{{ item }}' ]"
@@ -54,8 +39,7 @@
         state: disabled
       loop_control:
         loop_var: repo
-      loop:
-        - "{{ repos_to_disable }}"
+      loop: "{{ repos_to_disable }}"
       register: disable_repos
 
     - name: get new list of enabled repos
