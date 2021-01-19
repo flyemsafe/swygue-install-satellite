@@ -2,13 +2,14 @@
 - name: ensure all repos are enabled
   failed_when: false
   rhsm_repository:
-    name: "{{ repo }}"
+    name: "{{ item }}"
     state: enabled
   loop_control:
-    loop_var: repo
-  loop:
-    - "{{ satellite_repos }}"
+    label: "Enabling {{ item }}"
+  loop: "{{ satellite_repos }}"
   register: repos
+
+- meta: end_play
 
 - name: set respos enabled if true
   set_fact:
