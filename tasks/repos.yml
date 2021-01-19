@@ -1,6 +1,5 @@
 ---
 - name: ensure all repos are enabled
-  failed_when: false
   rhsm_repository:
     name: "{{ item }}"
     state: enabled
@@ -46,14 +45,16 @@
       set_fact:
         new_enabled_repos: "{{ disable_repos.results | to_json | from_json | json_query(jqs) }}"
 
+    - name: show new list of enabled repos
+      debug:
+        var: new_enabled_repos
+
     - name: create list repos enabled does not match required repos
       set_fact:
         current_repos: "{{ new_enabled_repos| difference(satellite_repos) | list }}"
 
-- name: show current repos
-  debug:
-    var: current_repos
-
+## The current_repos list should be empty to show that the expected current repos
+## matches what's expected
 - name: fail if the enabled repos are different from what's required
   fail:
     msg: "Was not able to ensure only the required repos for satellite installation are enabled"
